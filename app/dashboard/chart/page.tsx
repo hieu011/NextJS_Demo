@@ -31,6 +31,7 @@ import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import { useState } from "react";
+import { getCustomers } from "@/lib/customerAction";
 dayjs.extend(isoWeek);
 
 const chartConfig = {
@@ -97,18 +98,14 @@ const groupByWeek = (dailyData: Record<string, { total_quantity: number; total_p
     .map(([key, values]) => ({ key, ...values }));
 };
 
-export default function ChartPage() {
+export default function ChartCustomer() {
 
   const [checkAllWeek, setCheckAllWeek] = useState(true);
   const [week, setWeek] = useState('');
 
   const { data, error, isLoading } = useQuery({
-    queryKey: ["customerChartData"],
-    queryFn: async () => {
-      const res = await fetch("/api/customer");
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
-    },
+    queryKey: ["customers"],
+    queryFn: getCustomers,
   });
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -127,7 +124,7 @@ export default function ChartPage() {
         </div>
         <div>
           <Button asChild>
-            <Link href="/dashboard/product">Table Page</Link>
+            <Link href="/dashboard/customer">List Customer</Link>
           </Button>
         </div>
 
@@ -191,6 +188,5 @@ export default function ChartPage() {
         </div>
       </CardFooter>
     </Card>
-
   )
 }
