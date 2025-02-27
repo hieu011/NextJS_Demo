@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -63,15 +63,24 @@ export function DataTable<TData, TValue>({
     },
   })
 
+  const [localValue, setLocalValue] = useState(
+    (table.getColumn(filterKey)?.getFilterValue() as string) ?? ""
+  );
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      table.getColumn(filterKey)?.setFilterValue(localValue);
+    }, 500); 
+    return () => clearTimeout(handler); 
+  }, [localValue, table, filterKey]);
+
   return (
     <div>
       <div className="flex items-center gap-2 py-4">
         <Input
           placeholder="Search..."
-          value={(table.getColumn(filterKey)?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn(filterKey)?.setFilterValue(event.target.value)
-          }
+          value={localValue}
+          onChange={(event) => setLocalValue(event.target.value)}
           className="max-w-sm"
         />
 
