@@ -30,6 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { filter } from "lodash";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -63,17 +64,17 @@ export function DataTable<TData, TValue>({
     },
   })
 
-  const [localValue, setLocalValue] = useState(
-    (table.getColumn(filterKey)?.getFilterValue() as string) ?? ""
-  );
+  const [localValue, setLocalValue] = useState("");
 
+  
   useEffect(() => {
     const handler = setTimeout(() => {
+      if(localValue == "") table.resetColumnFilters();
       table.getColumn(filterKey)?.setFilterValue(localValue);
-    }, 500); 
-    return () => clearTimeout(handler); 
-  }, [localValue, table, filterKey]);
-
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [localValue]);
+  
   return (
     <div>
       <div className="flex items-center gap-2 py-4">
@@ -84,7 +85,11 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         />
 
-        <Select value={filterKey} onValueChange={(value) => setFilterKey(value)}>
+        <Select value={filterKey} onValueChange={
+          (value) => {
+            setFilterKey(value);
+            setLocalValue("");
+          }}>
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Search by" />
           </SelectTrigger>
